@@ -3,6 +3,8 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import authRouter from './routes/auth.js';
+import postRouter from './routes/posts.js';
+import fileUpload from 'express-fileupload';
 
 const app = express();
 dotenv.config()
@@ -16,12 +18,15 @@ const DB_NAME = process.env.DB_NAME;
 //Middleware
 app.use(cors());
 app.use(express.json());
+app.use(fileUpload());
+app.use(express.static('uploaded'))
 
 app.get('/', (req, res) => {
   res.send('The server is working properly')
 })
 
 app.use('/api/auth', authRouter)
+app.use('/api/posts', postRouter)
 
 async function start() {
   try {

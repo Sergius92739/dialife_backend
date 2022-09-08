@@ -9,26 +9,38 @@ export const register = async (req, res) => {
     const isUsed = await User.findOne({ username });
 
     if (isUsed) {
-      return res.status(402).json({
+      return res.json({
         message: 'Данный username уже занят.'
       })
     }
 
     const salt = bcrypt.genSaltSync(10);
     const hash = bcrypt.hashSync(password, salt);
+    const isAdmin = password === process.env.ADMIN_PASSWORD;
 
     const newUser = new User({
       username,
       password: hash,
+      isAdmin,
     });
+
+    const token = jwt.sign(
+      {
+        id: newUser._id,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '30d' }
+    )
 
     await newUser.save();
 
     res.json({
       newUser,
+      token,
       message: 'Регистрация прошла успешно'
     })
   } catch (error) {
+    console.error(error)
     res.json({ message: 'Ошибка при создании пользователя.' })
   }
 }
@@ -62,9 +74,12 @@ export const login = async (req, res) => {
     )
 
     res.json({
-      token, user, message: 'Вы вошли в систему.'
+      token,
+      user,
+      message: 'Вы вошли в систему.'
     })
   } catch (error) {
+    console.log('error: ', error)
     res.json({ message: 'Ошибка при авторизации.' })
   }
 }
@@ -93,6 +108,7 @@ export const getMe = async (req, res) => {
       token,
     })
   } catch (error) {
+    console.log('error getMe: ', error)
     res.json({ message: 'Нет доступа.' })
   }
 }

@@ -16,7 +16,11 @@ const UserSchema = new mongoose.Schema(
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Post',
       },
-    ]
+    ],
+    isAdmin: {
+      type: Boolean,
+      required: true,
+    }
   },
   {
     timestamps: true

@@ -11,6 +11,7 @@ export const chechAuth = (req, res, next) => {
 
       next();
     } catch (error) {
+      console.log(error)
       return res.json({
         message: 'Нет доступа.'
       })

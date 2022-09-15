@@ -1,6 +1,8 @@
 import User from '../models/User.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import path, { dirname } from 'path';
+import { fileURLToPath } from "url";
 
 // Register user
 export const register = async (req, res) => {
@@ -14,6 +16,16 @@ export const register = async (req, res) => {
       })
     }
 
+    let filename;
+
+    if (req.files.avatar.size) {
+      filename = Date.now().toString() + req.files.avatar.name;
+      const __dirname = dirname(fileURLToPath(import.meta.url));
+      req.files.avatar.mv(path.join(__dirname, '..', 'uploaded', filename));
+    } else {
+      filename = '';
+    }
+
     const salt = bcrypt.genSaltSync(10);
     const hash = bcrypt.hashSync(password, salt);
     const isAdmin = password === process.env.ADMIN_PASSWORD;
@@ -21,6 +33,7 @@ export const register = async (req, res) => {
     const newUser = new User({
       username,
       password: hash,
+      avatar: filename,
       isAdmin,
     });
 

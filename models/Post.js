@@ -5,6 +5,10 @@ const PostSchema =  new mongoose.Schema(
     username: {
       type: String
     },
+    avatar: {
+      type: String,
+      default: '',
+    },
     title: {
       type: String,
       required: true
@@ -21,6 +25,8 @@ const PostSchema =  new mongoose.Schema(
       type: Number,
       default: 0
     },
+    likes: [],
+    dislikes: [],
     author: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User'

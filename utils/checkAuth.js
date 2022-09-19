@@ -1,7 +1,7 @@
-import jwt from 'jsonwebtoken';
+import jwt from "jsonwebtoken";
 
-export const chechAuth = (req, res, next) => {
-  const token = (req.headers.authorization || '').replace(/Bearer\s?/, '');
+export const checkAuth = (req, res, next) => {
+  const token = (req.get("authorization") || "").replace(/Bearer\s?/, "");
 
   if (token) {
     try {
@@ -11,14 +11,14 @@ export const chechAuth = (req, res, next) => {
 
       next();
     } catch (error) {
-      console.log(error)
+      console.log(error);
       return res.json({
-        message: 'Нет доступа.'
-      })
+        message: "Нет доступа.",
+      });
     }
   } else {
     return res.json({
-      message: 'Нет доступа.'
-    })
+      message: "Нет доступа.",
+    });
   }
-}
+};

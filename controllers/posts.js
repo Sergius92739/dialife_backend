@@ -89,8 +89,8 @@ export const getAllPosts = async (req, res) => {
   }
 };
 
-// Get Post by Id
-export const getPostById = async (req, res) => {
+// Get Post by id and update views
+export const getPostAndUpdateViews = async (req, res) => {
   try {
     const post = await Post.findByIdAndUpdate(req.params.id, {
       $inc: { views: 1 },
@@ -102,6 +102,17 @@ export const getPostById = async (req, res) => {
   }
 };
 
+// Get post by id
+export const getPostById = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    res.json(post);
+  } catch (error) {
+    console.error(error);
+    res.json({ message: error.message });
+  }
+};
+
 // Put like the post
 export const likesHandler = async (req, res) => {
   try {
@@ -109,18 +120,20 @@ export const likesHandler = async (req, res) => {
     const post = await Post.findById(postId);
 
     if (post.likes.some((el) => el === userId)) {
-      const _post = await Post.findByIdAndUpdate(postId, {
+      await Post.findByIdAndUpdate(postId, {
         $pull: { likes: userId },
       });
+      const _post = await Post.findById(postId);
       res.json({
         _post,
         message: `Лайк отменён.`,
       });
     } else {
-      const _post = await Post.findByIdAndUpdate(postId, {
+      await Post.findByIdAndUpdate(postId, {
         $push: { likes: userId },
         $pull: { dislikes: userId },
       });
+      const _post = await Post.findById(postId);
       res.json({
         _post,
         message: `Лайк поставлен.`,
@@ -133,25 +146,27 @@ export const likesHandler = async (req, res) => {
     });
   }
 };
-
+// put dislike
 export const dislikesHandler = async (req, res) => {
   try {
     const { postId, userId } = req.params;
     const post = await Post.findById(postId);
 
     if (post.dislikes.some((el) => el === userId)) {
-      const _post = await Post.findByIdAndUpdate(postId, {
+      await Post.findByIdAndUpdate(postId, {
         $pull: { dislikes: userId },
       });
+      const _post = await Post.findById(postId);
       res.json({
         _post,
         message: `Дизлайк отменён.`,
       });
     } else {
-      const _post = await Post.findByIdAndUpdate(postId, {
+      await Post.findByIdAndUpdate(postId, {
         $push: { dislikes: userId },
         $pull: { likes: userId },
       });
+      const _post = await Post.findById(postId);
       res.json({
         _post,
         message: `Дизлайк поставлен.`,
@@ -162,5 +177,20 @@ export const dislikesHandler = async (req, res) => {
     res.json({
       message: `Ошибка запроса поставить дизлайк.`,
     });
+  }
+};
+
+export const getMyPosts = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    const list = await Promise.all(
+      user.posts.map((post) => {
+        return Post.findById(post._id);
+      })
+    );
+    res.json(list);
+  } catch (error) {
+    console.log(error);
+    res.json({ message: "Ошибка получения постов пользователя." });
   }
 };

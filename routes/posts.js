@@ -8,6 +8,7 @@ import {
   dislikesHandler,
   getMyPosts,
   removePost,
+  updatePost,
 } from "../controllers/posts.js";
 import { checkAuth } from "../utils/checkAuth.js";
 
@@ -30,5 +31,7 @@ router.get("/:postId/:userId/likes", likesHandler);
 router.get("/:postId/:userId/dislikes", dislikesHandler);
 // Remove post
 router.delete("/:id", checkAuth, removePost);
+// Update post
+router.put("/:id", checkAuth, updatePost);
 
 export default router;

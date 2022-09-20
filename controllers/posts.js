@@ -117,27 +117,18 @@ export const getPostById = async (req, res) => {
 export const likesHandler = async (req, res) => {
   try {
     const { postId, userId } = req.params;
-    const post = await Post.findById(postId);
+    const _post = await Post.findById(postId);
 
-    if (post.likes.some((el) => el === userId)) {
-      await Post.findByIdAndUpdate(postId, {
-        $pull: { likes: userId },
-      });
-      const _post = await Post.findById(postId);
-      res.json({
-        _post,
-        message: `Лайк отменён.`,
-      });
+    if (_post.likes.some((el) => el === userId)) {
+      _post.likes = _post.likes.filter((el) => el !== userId);
+      // _post.dislikes = _post.dislikes.filter((el) => el === userId);
+      await _post.save();
+      res.json({ _post, message: "Лайк отменён." });
     } else {
-      await Post.findByIdAndUpdate(postId, {
-        $push: { likes: userId },
-        $pull: { dislikes: userId },
-      });
-      const _post = await Post.findById(postId);
-      res.json({
-        _post,
-        message: `Лайк поставлен.`,
-      });
+      _post.likes.push(userId);
+      _post.dislikes = _post.dislikes.filter((el) => el !== userId);
+      await _post.save();
+      res.json({ _post, message: "Лайк поставлен." });
     }
   } catch (error) {
     console.error(error);
@@ -146,31 +137,21 @@ export const likesHandler = async (req, res) => {
     });
   }
 };
-// put dislike
+// put dislike the post
 export const dislikesHandler = async (req, res) => {
   try {
     const { postId, userId } = req.params;
-    const post = await Post.findById(postId);
+    const _post = await Post.findById(postId);
 
-    if (post.dislikes.some((el) => el === userId)) {
-      await Post.findByIdAndUpdate(postId, {
-        $pull: { dislikes: userId },
-      });
-      const _post = await Post.findById(postId);
-      res.json({
-        _post,
-        message: `Дизлайк отменён.`,
-      });
+    if (_post.dislikes.some((el) => el === userId)) {
+      _post.dislikes = _post.dislikes.filter((el) => el !== userId);
+      await _post.save();
+      res.json({ _post, message: "Дизлайк отменён." });
     } else {
-      await Post.findByIdAndUpdate(postId, {
-        $push: { dislikes: userId },
-        $pull: { likes: userId },
-      });
-      const _post = await Post.findById(postId);
-      res.json({
-        _post,
-        message: `Дизлайк поставлен.`,
-      });
+      _post.dislikes.push(userId);
+      _post.likes = _post.likes.filter((el) => el !== userId);
+      await _post.save();
+      res.json({ _post, message: "Дизлайк поставлен." });
     }
   } catch (error) {
     console.error(error);
@@ -208,5 +189,29 @@ export const removePost = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.json({ message: "Ошибка удаления поста." });
+  }
+};
+// Update post
+export const updatePost = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { title, text } = req.body;
+    const post = await Post.findById(id);
+
+    if (req.files.image.size) {
+      const filename = Date.now().toString() + req.files.image.name;
+      const __dirname = dirname(fileURLToPath(import.meta.url));
+      req.files.image.mv(path.join(__dirname, "..", "uploaded", filename));
+      post.imgUrl = filename;
+    }
+
+    post.title = title;
+    post.text = text;
+    await post.save();
+
+    res.json({ post, message: "Пост успешно обновлён." });
+  } catch (error) {
+    console.error(error);
+    res.json({ message: "Ошибка обновления поста." });
   }
 };

@@ -179,7 +179,7 @@ export const dislikesHandler = async (req, res) => {
     });
   }
 };
-
+// get my Posts
 export const getMyPosts = async (req, res) => {
   try {
     const user = await User.findById(req.userId);
@@ -192,5 +192,21 @@ export const getMyPosts = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.json({ message: "Ошибка получения постов пользователя." });
+  }
+};
+// Remove post
+export const removePost = async (req, res) => {
+  try {
+    const post = await Post.findByIdAndDelete(req.params.id);
+    if (!post) {
+      return res.json({ message: "Такого поста не существует." });
+    }
+    await User.findByIdAndUpdate(req.userId, {
+      $pull: { posts: req.params.id },
+    });
+    res.json({ postId: req.params.id, message: "Пост был удалён." });
+  } catch (error) {
+    console.error(error);
+    res.json({ message: "Ошибка удаления поста." });
   }
 };

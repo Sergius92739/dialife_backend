@@ -9,6 +9,7 @@ import {
   getMyPosts,
   removePost,
   updatePost,
+  getPostComments
 } from "../controllers/posts.js";
 import { checkAuth } from "../utils/checkAuth.js";
 
@@ -33,5 +34,7 @@ router.get("/:postId/:userId/dislikes", dislikesHandler);
 router.delete("/:id", checkAuth, removePost);
 // Update post
 router.put("/:id", checkAuth, updatePost);
+// Get post comments
+router.get("/:id/comments", getPostComments)
 
 export default router;

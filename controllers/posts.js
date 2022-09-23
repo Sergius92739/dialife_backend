@@ -2,6 +2,7 @@ import Post from "../models/Post.js";
 import User from "../models/User.js";
 import path, { dirname } from "path";
 import { fileURLToPath } from "url";
+import Comment from "../models/Comment.js";
 
 // Create post
 export const createPost = async (req, res) => {
@@ -203,6 +204,8 @@ export const updatePost = async (req, res) => {
       const __dirname = dirname(fileURLToPath(import.meta.url));
       req.files.image.mv(path.join(__dirname, "..", "uploaded", filename));
       post.imgUrl = filename;
+    } else {
+      post.imgUrl = '';
     }
 
     post.title = title;
@@ -215,3 +218,22 @@ export const updatePost = async (req, res) => {
     res.json({ message: "Ошибка обновления поста." });
   }
 };
+
+// Get post comments
+export const getPostComments = async (req, res) => {
+ try {
+   const post = await Post.findById(req.params.id);
+   const {comments} = post;
+   const list = await Promise.all(
+       comments.map((comment) => {
+         return Comment.findById(comment);
+       })
+   )
+   res.json(list.reverse());
+ } catch (error) {
+   console.error(error);
+   res.json({message: "Ошибка получения комментариев к посту."})
+ }
+
+
+}

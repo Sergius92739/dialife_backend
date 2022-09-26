@@ -5,28 +5,39 @@ import User from "../models/User.js";
 // Create comment
 export const createComment = async (req, res) => {
     try {
-        const {postId, comment, userId} = req.body;
+        const {postId, comment, userId, type, commentId} = req.body;
 
         if (!comment) {
             return res.json({message: 'Комментарий не может быть пустым.'});
         }
 
         let author;
-
         try {
             const user = await User.findById(userId);
             const {username, avatar, _id} = user;
             author = {
                 username,
                 avatar,
-                _id,
+                userId: _id,
             }
         } catch (error) {
             console.error(error);
             res.json({message: 'Ошибка идентификации пользователя при создании комментария.'})
         }
 
-        const newComment = new Comment({comment, author});
+        let answerTo;
+        if (commentId) {
+            try {
+                const commentEl = await Comment.findById(commentId);
+                const {author, comment} = commentEl;
+                answerTo = {...author, comment};
+            } catch (error) {
+                console.error(error);
+                res.json({message: 'Ошибка идентификации комментария'});
+            }
+        }
+
+        const newComment = new Comment({comment, author, type, answerTo, postId});
         await newComment.save();
 
         try {
@@ -44,5 +55,16 @@ export const createComment = async (req, res) => {
         res.json({message: "Ошибка создания комментария."});
     }
 };
+
+// Get user comments
+export const getUserComments = async (req, res) => {
+    try {
+        const count = await Comment.countDocuments({userId: req.params.userId})
+        res.json({count})
+    } catch (error) {
+        console.error(error)
+        res.json({message: 'Ошибка получения комментариев пользователя.'})
+    }
+}
 
 

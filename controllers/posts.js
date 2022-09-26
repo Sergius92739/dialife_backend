@@ -31,6 +31,7 @@ export const createPost = async (req, res) => {
 
             const newPostWithImage = new Post({
                 username: user.username,
+                userId: req.userId,
                 avatar,
                 title,
                 text,
@@ -51,6 +52,7 @@ export const createPost = async (req, res) => {
 
         const newPostWithoutImage = new Post({
             username: user.username,
+            userId: req.userId,
             avatar,
             title,
             text,
@@ -175,6 +177,16 @@ export const getMyPosts = async (req, res) => {
         res.json({message: "Ошибка получения постов пользователя."});
     }
 };
+// Get my posts count
+export const getMyPostsCount = async (req, res) => {
+    try {
+        const postsCount = await Post.count({userId: req.userId})
+        res.json({postsCount})
+    }catch (error) {
+        console.error(error);
+        res.json({message: 'Ошибка получения количества постов пользователя.'})
+    }
+}
 // Remove post
 export const removePost = async (req, res) => {
     try {

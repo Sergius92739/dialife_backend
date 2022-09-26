@@ -59,11 +59,21 @@ export const createComment = async (req, res) => {
 // Get user comments
 export const getUserComments = async (req, res) => {
     try {
-        const count = await Comment.countDocuments({userId: req.params.userId})
-        res.json({count})
+        const comments = await Comment.find({userId: req.userId})
+        res.json({comments})
     } catch (error) {
         console.error(error)
         res.json({message: 'Ошибка получения комментариев пользователя.'})
+    }
+}
+// Get user comments count
+export const getUserCommentsCount = async (req, res) => {
+    try {
+        const commentsCount = await Comment.count({userId: req.userId})
+        res.json({commentsCount})
+    } catch (error) {
+        console.error(error);
+        res.json({message: 'Ошибка получения количества комментариев пользователя.'})
     }
 }
 

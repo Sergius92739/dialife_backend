@@ -9,7 +9,7 @@ import {
   getMyPosts,
   removePost,
   updatePost,
-  getPostComments
+  getPostComments, getMyPostsCount
 } from "../controllers/posts.js";
 import { checkAuth } from "../utils/checkAuth.js";
 
@@ -22,6 +22,8 @@ router.post("/add", checkAuth, createPost);
 router.get("/all", getAllPosts);
 // get my posts
 router.get("/user", checkAuth, getMyPosts);
+// get my posts count
+router.get("/user/count", checkAuth, getMyPostsCount)
 // get post by id and update views
 router.get("/:id/updateViews", getPostAndUpdateViews);
 // get post by id

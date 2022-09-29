@@ -3,6 +3,7 @@ import User from "../models/User.js";
 import path, {dirname} from "path";
 import {fileURLToPath} from "url";
 import Comment from "../models/Comment.js";
+import {unlink} from "fs";
 
 // Create post
 export const createPost = async (req, res) => {
@@ -180,7 +181,7 @@ export const getMyPosts = async (req, res) => {
 // Get my posts count
 export const getMyPostsCount = async (req, res) => {
     try {
-        const postsCount = await Post.count({userId: req.userId})
+        const postsCount = await Post.countDocuments({userId: req.userId})
         res.json({postsCount})
     }catch (error) {
         console.error(error);
@@ -212,12 +213,18 @@ export const updatePost = async (req, res) => {
         const post = await Post.findById(id);
 
         if (req.files.image.size) {
+            const {imgUrl} = post;
+            if (imgUrl) {
+                unlink(`uploaded/${imgUrl}`, (error) => {
+                    if (error) {
+                        return res.json({message: 'Не удалось удалить старое изображение.'})
+                    }
+                })
+            }
             const filename = Date.now().toString() + req.files.image.name;
             const __dirname = dirname(fileURLToPath(import.meta.url));
-            req.files.image.mv(path.join(__dirname, "..", "uploaded", filename));
+            await req.files.image.mv(path.join(__dirname, "..", "uploaded", filename));
             post.imgUrl = filename;
-        } else {
-            post.imgUrl = '';
         }
 
         post.title = title;

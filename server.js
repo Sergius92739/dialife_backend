@@ -5,6 +5,8 @@ import cors from "cors";
 import authRouter from "./routes/auth.js";
 import postRouter from "./routes/posts.js";
 import commentRouter from "./routes/comment.js";
+import articlesRouter from "./routes/articles.js";
+import adminRouter from "./routes/admin.js";
 import fileUpload from "express-fileupload";
 
 const app = express();
@@ -29,6 +31,8 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRouter);
 app.use("/api/posts", postRouter);
 app.use("/api/comments", commentRouter);
+app.use("/api/articles", articlesRouter);
+app.use("/api/admin", adminRouter);
 
 async function start() {
   try {

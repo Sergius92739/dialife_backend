@@ -28,8 +28,8 @@ const PostSchema = new mongoose.Schema(
             type: Number,
             default: 0
         },
-        likes: [],
-        dislikes: [],
+        likes: {type: [String]},
+        dislikes: {type: [String]},
         author: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User'

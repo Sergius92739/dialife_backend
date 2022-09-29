@@ -12,7 +12,7 @@ const CommentSchema = new mongoose.Schema(
         comment: {type: String, required: true},
         author: {
             username: {type: String, required: true},
-            avatar: {type: String},
+            avatar: {type: String, default: ''},
             userId: {type: String, required: true}
         },
         postId: {type: String, required: true}

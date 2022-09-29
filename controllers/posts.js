@@ -207,7 +207,7 @@ export const removePost = async (req, res) => {
 // Update post
 export const updatePost = async (req, res) => {
     try {
-        const id = req.params.id;
+        const {id} = req.params;
         const {title, text} = req.body;
         const post = await Post.findById(id);
 

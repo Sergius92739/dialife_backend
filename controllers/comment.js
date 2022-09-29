@@ -76,5 +76,19 @@ export const getUserCommentsCount = async (req, res) => {
         res.json({message: 'Ошибка получения количества комментариев пользователя.'})
     }
 }
+// Update user comment
+export const updateUserComment = async (req, res) => {
+    try {
+        const {text, commentId} = req.body;
+        const commentEl = await Comment.findById(commentId);
+        commentEl.comment = text;
+        await commentEl.save();
+
+        res.json({message: 'Комментарий успешно обновлен.', comment: commentEl})
+    } catch (error) {
+        console.error(error);
+        res.json({message: 'Ошибка обновления комментария.'})
+    }
+}
 
 
